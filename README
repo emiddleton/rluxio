@@ -6,14 +6,13 @@
 
 == SYNOPSIS
  require 'luxio'
- luxio = LuxIOBtree.new
- luxio.open '/var/tmp/test', LuxIOBtree::LUX_DB_CREAT
+ luxio = LuxIOBtree.new('/var/tmp/test', LuxIOBtree::LUX_DB_CREAT)
  
- luxio.put 'key', 'value'
+ luxio['key'] = 'value'
  # => true
- luxio.get 'key'
+ luxio['key']
  # => "value"
- luxio.del 'key'
+ luxio.delete('key')
  # => true
- luxio.get 'key'
+ luxio['key']
  # => nil

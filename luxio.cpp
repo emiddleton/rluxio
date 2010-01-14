@@ -74,10 +74,13 @@ static VALUE luxio_object_delete(LuxIO *ptr)
     return Qtrue;
 }
 
-static VALUE luxio_object_alloc(VALUE klass)
+static VALUE luxio_object_alloc(VALUE klass, VALUE _filename, VALUE _flag)
 {
     LuxIO *ptr = ALLOC(LuxIO);
-    return Data_Wrap_Struct(klass, 0, luxio_object_delete, ptr);
+    VALUE obj;
+    obj = Data_Wrap_Struct(klass, 0, luxio_object_delete, ptr);
+    rb_luxiobtree_open(obj, _filename, _flag);
+    return obj;
 }
 
 extern "C" {
@@ -85,11 +88,10 @@ extern "C" {
     {
         VALUE klass;
         klass = rb_define_class("LuxIOBtree" ,rb_cObject);
-        rb_define_singleton_method(klass, "new", reinterpret_cast<VALUE(*)(...)>(luxio_object_alloc), 0); 
-        rb_define_method(klass, "open", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_open), 2);
-        rb_define_method(klass, "put", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_put), 2);
-        rb_define_method(klass, "get", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_get), 1);
-        rb_define_method(klass, "del", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_del), 1);
+        rb_define_singleton_method(klass, "new", reinterpret_cast<VALUE(*)(...)>(luxio_object_alloc), 2); 
+        rb_define_method(klass, "[]=", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_put), 2);
+        rb_define_method(klass, "[]", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_get), 1);
+        rb_define_method(klass, "delete", reinterpret_cast<VALUE(*)(...)>(rb_luxiobtree_del), 1);
 
         rb_define_const(klass, "LUX_DB_RDONLY", INT2NUM(Lux::IO::DB_RDONLY));
         rb_define_const(klass, "LUX_DB_RDWR", INT2NUM(Lux::IO::DB_RDWR));
